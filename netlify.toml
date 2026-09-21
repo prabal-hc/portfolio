@@ -1,7 +1,19 @@
-# Netlify detects Next.js automatically and installs its runtime; this just pins the build and the Node version
-# (Next.js 16 needs Node 20.9 or newer).
+# The site is a static export (`output: "export"` in next.config.ts), so Netlify just serves the `out/` folder.
 [build]
   command = "npm run build"
+  publish = "out"
 
 [build.environment]
+  # Next.js 16 needs Node 20.9 or newer.
   NODE_VERSION = "22"
+
+# Long-lived caching for the fingerprinted build assets and the 3D model.
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/models/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
