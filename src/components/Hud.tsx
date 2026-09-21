@@ -5,6 +5,9 @@ import { scroll, scrollTargetFor, SECTION_COUNT } from "@/lib/scroll";
 
 const LABELS = ["Start", "About", "Skills", "Work", "Journey", "Contact"];
 
+/** The speedometer reads 0 at the top of the page and this many km/h at the bottom. */
+const TOP_SPEED = 160;
+
 /**
  * Fixed chrome. Side layout: section dots and a speedometer that tracks scroll progress.
  * Stacked layout (phones, portrait tablets): just a slim progress bar, so nothing collides with the text panels.
@@ -21,7 +24,7 @@ export default function Hud() {
     const CIRC = 2 * Math.PI * 34;
     const tick = () => {
       shown += (scroll.progress - shown) * 0.12;
-      if (speedRef.current) speedRef.current.textContent = String(Math.round(shown * 180)).padStart(3, "0");
+      if (speedRef.current) speedRef.current.textContent = String(Math.round(shown * TOP_SPEED)).padStart(3, "0");
       if (arcRef.current) arcRef.current.style.strokeDashoffset = String(CIRC * (1 - shown * 0.75));
       if (barRef.current) barRef.current.style.transform = `scaleX(${shown.toFixed(4)})`;
       const active = Math.round(shown * (SECTION_COUNT - 1));
