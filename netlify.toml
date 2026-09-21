@@ -1,0 +1,7 @@
+# Netlify detects Next.js automatically and installs its runtime; this just pins the build and the Node version
+# (Next.js 16 needs Node 20.9 or newer).
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
