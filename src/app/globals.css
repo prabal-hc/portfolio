@@ -80,6 +80,13 @@ main > section {
   opacity: 1;
   transform: translate3d(0, 0, 0);
 }
+/* While the loader is up, keep every section's content in its "before" state and skip the transition, so that when the
+   loader leaves the hero animates in. */
+html[data-loading] .reveal > * {
+  opacity: 0 !important;
+  transform: translate3d(var(--dx), 90px, 0) !important;
+  transition: none !important;
+}
 .reveal[data-in="true"] > *:nth-child(2) { transition-delay: 0.08s; }
 .reveal[data-in="true"] > *:nth-child(3) { transition-delay: 0.16s; }
 .reveal[data-in="true"] > *:nth-child(4) { transition-delay: 0.24s; }

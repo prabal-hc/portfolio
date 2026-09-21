@@ -3,6 +3,7 @@
 import { Canvas } from "@react-three/fiber";
 import { ContactShadows, Environment, Lightformer, MeshReflectorMaterial } from "@react-three/drei";
 import { Bloom, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
+import { announceSceneReady } from "@/lib/loading";
 import { Bike } from "./Bike";
 import { Rig } from "./Rig";
 
@@ -12,6 +13,7 @@ export default function Scene() {
   return (
     <div className="fixed inset-0 z-0">
       <Canvas
+        onCreated={() => window.setTimeout(announceSceneReady, 600)}
         dpr={[1, 1.75]}
         camera={{ fov: 35, near: 0.1, far: 60, position: [3, 1.5, 4.5] }}
         gl={{ antialias: true, powerPreference: "high-performance" }}

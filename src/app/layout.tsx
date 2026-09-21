@@ -29,8 +29,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
-      <body>{children}</body>
+    // data-loading is removed by <Loader/> when everything is ready; until then section content is held back.
+    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`} data-loading="">
+      <body>
+        {/* without JavaScript there is no loader and nothing to wait for: show the page */}
+        <noscript>
+          <style>{`#loader{display:none}html[data-loading] .reveal>*{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+        {children}
+      </body>
     </html>
   );
 }

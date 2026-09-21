@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { scroll } from "@/lib/scroll";
 import { cameraAt, FOV } from "@/lib/cameraPath";
 import { isSideLayout } from "@/lib/layout";
+import { announceSceneReady } from "@/lib/loading";
 
 /** Royal Enfield Hunter 350 – Dapper Grey by Bhavik Suthar (Sketchfab, embed enabled by the author). */
 const MODEL_UID = "acb58ee62cfa4644af99caf4adbfdb5b";
@@ -209,6 +210,8 @@ export default function SketchfabStage() {
               if (!alive) return;
               start(api);
               setReady(true);
+              // let the first camera pose and a few frames land before the loader lifts away
+              window.setTimeout(announceSceneReady, 900);
             });
           },
           error: () => console.warn("Sketchfab viewer failed to initialise"),
