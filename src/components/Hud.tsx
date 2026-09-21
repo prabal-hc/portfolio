@@ -1,41 +1,40 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { scroll, scrollTargetFor, SECTION_COUNT } from "@/lib/scroll";
+import { scroll } from "@/lib/scroll";
+import FuelBar, { type FuelBarHandle } from "./FuelBar";
+import Speedometer, { type SpeedometerHandle } from "./Speedometer";
 
-const LABELS = ["Start", "About", "Skills", "Work", "Journey", "Contact"];
-
-/** The speedometer reads 0 at the top of the page and this many km/h at the bottom. */
-const TOP_SPEED = 160;
+/** The speedometer reads 0 at the top of the page and stops at this many km/h at the very end (the dial itself goes to 160). */
+const END_SPEED = 140;
 
 /**
- * Fixed chrome. Side layout: section dots and a speedometer that tracks scroll progress.
- * Stacked layout (phones, portrait tablets): just a slim progress bar, so nothing collides with the text panels.
+ * Fixed chrome.
+ *  side layout    – on the right, an upright fuel indicator (full at the hero, draining as you scroll, empty at the end), and
+ *                   bottom-left, a Hunter-style speedometer that tracks scroll progress.
+ *  stacked layout – phones and portrait tablets: just a slim progress bar, so nothing collides with the text.
  */
 export default function Hud() {
-  const speedRef = useRef<HTMLSpanElement>(null);
-  const arcRef = useRef<SVGCircleElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
-  const dotRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const fuelRef = useRef<FuelBarHandle>(null);
+  const pctRef = useRef<HTMLSpanElement>(null);
+  const speedoRef = useRef<SpeedometerHandle>(null);
 
   useEffect(() => {
     let raf = 0;
     let shown = 0;
-    const CIRC = 2 * Math.PI * 34;
     const tick = () => {
       shown += (scroll.progress - shown) * 0.12;
-      if (speedRef.current) speedRef.current.textContent = String(Math.round(shown * TOP_SPEED)).padStart(3, "0");
-      if (arcRef.current) arcRef.current.style.strokeDashoffset = String(CIRC * (1 - shown * 0.75));
+      speedoRef.current?.set(shown * END_SPEED);
       if (barRef.current) barRef.current.style.transform = `scaleX(${shown.toFixed(4)})`;
-      const active = Math.round(shown * (SECTION_COUNT - 1));
-      dotRefs.current.forEach((d, i) => d?.setAttribute("data-active", String(i === active)));
+      // fuel burns as you ride: full at the hero, draining as you scroll, nearly empty at the very end
+      fuelRef.current?.set(1 - shown);
+      if (pctRef.current) pctRef.current.textContent = String(Math.round((1 - shown) * 100)).padStart(2, "0");
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, []);
-
-  const go = (i: number) => scroll.lenis?.scrollTo(scrollTargetFor(i), { duration: 1.6 });
 
   return (
     <>
@@ -44,47 +43,26 @@ export default function Hud() {
         <div ref={barRef} className="h-full origin-left bg-accent" style={{ transform: "scaleX(0)" }} />
       </div>
 
-      <nav aria-label="Sections" className="fixed right-3 top-1/2 z-30 hidden -translate-y-1/2 flex-col gap-4 md:flex side:right-4">
-        {LABELS.map((label, i) => (
-          <button
-            key={label}
-            ref={(el) => {
-              dotRefs.current[i] = el;
-            }}
-            onClick={() => go(i)}
-            aria-label={label}
-            className="group flex items-center justify-end gap-3 p-1"
-          >
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted opacity-0 transition-opacity group-hover:opacity-100">
-              {label}
-            </span>
-            <span className="block h-2 w-2 rounded-full border border-fg/40 transition-all group-data-[active=true]:scale-125 group-data-[active=true]:border-accent group-data-[active=true]:bg-accent" />
-          </button>
-        ))}
-      </nav>
-
-      {/* side layouts: speedometer */}
-      <div className="pointer-events-none fixed bottom-6 left-8 z-30 hidden items-center gap-3 side:flex side:bottom-8 side:left-[clamp(2rem,5vw,9rem)]">
-        <svg viewBox="0 0 80 80" className="-rotate-[225deg] h-[clamp(64px,4.6vw,110px)] w-[clamp(64px,4.6vw,110px)]">
-          <circle cx="40" cy="40" r="34" fill="none" stroke="var(--line)" strokeWidth="2" strokeDasharray={`${2 * Math.PI * 34 * 0.75} 999`} />
-          <circle
-            ref={arcRef}
-            cx="40"
-            cy="40"
-            r="34"
-            fill="none"
-            stroke="var(--accent)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeDasharray={`${2 * Math.PI * 34} 999`}
-            strokeDashoffset={2 * Math.PI * 34}
-          />
-        </svg>
-        <div className="font-mono leading-none">
-          <span ref={speedRef} className="text-[clamp(1.5rem,1.6vw,2.4rem)]">000</span>
-          <span className="ml-1 text-[10px] uppercase tracking-widest text-muted">km/h</span>
-          <div className="mt-1 text-[10px] uppercase tracking-[0.25em] text-muted">Scroll to ride</div>
+      {/* side layouts: scroll progress as an upright fuel indicator on the right (full at the top of the page, empty at the end) */}
+      <div
+        role="img"
+        aria-label="Scroll progress"
+        // width + right offset here must fit inside the right margin set on <Section> in Sections.tsx
+        className="pointer-events-none fixed right-[clamp(1rem,1.8vw,2.5rem)] top-1/2 z-30 hidden w-[clamp(44px,3vw,72px)] -translate-y-1/2 flex-col items-center gap-1 side:flex"
+      >
+        <FuelBar ref={fuelRef} initialLevel={1} className="w-[70%]" />
+        <div className="flex items-baseline gap-0.5 font-display leading-none">
+          <span ref={pctRef} className="text-[clamp(1.4rem,1.7vw,2.4rem)]">
+            100
+          </span>
+          <span className="text-[clamp(0.7rem,0.8vw,1.1rem)] text-accent">%</span>
         </div>
+      </div>
+
+      {/* side layouts: the speedometer (hidden on very short windows, where it would run into the text) */}
+      <div className="pointer-events-none fixed bottom-6 left-8 z-30 hidden flex-col items-center gap-1 side:flex side:bottom-8 side:left-[clamp(2rem,5vw,9rem)] [@media(max-height:640px)]:!hidden">
+        <Speedometer ref={speedoRef} className="w-[clamp(118px,8vw,210px)]" />
+        <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted">Scroll to ride</p>
       </div>
     </>
   );

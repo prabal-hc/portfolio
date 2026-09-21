@@ -17,7 +17,8 @@ function Section({ id, side, children }: { id: string; side: Side; children: Rea
   return (
     <section
       id={id}
-      className="relative flex items-end px-5 pb-[10svh] pt-[50svh] sm:px-8 side:items-center side:px-[clamp(2rem,5vw,9rem)] side:py-[7svh] side:min-h-[62svh]"
+      // side layout: the right margin is a little wider so the fuel indicator on the right edge (see Hud.tsx) never sits on the text
+      className="relative flex items-end px-5 pb-[10svh] pt-[50svh] sm:px-8 side:items-center side:pl-[clamp(2rem,5vw,9rem)] side:pr-[clamp(5rem,6.6vw,9rem)] side:py-[7svh] side:min-h-[62svh]"
     >
       <Reveal
         side={side}
