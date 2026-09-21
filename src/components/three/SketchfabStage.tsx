@@ -72,7 +72,7 @@ function applyQuality(api: SketchfabApi) {
     enable: true,
     taaEnable: false, // temporal AA smears while the camera is always moving; super-sampling covers edges
     sharpenEnable: true,
-    sharpenFactor: 0.3,
+    sharpenFactor: light ? 0.12 : 0.3, // sharpening exaggerates glints on the glossy paint, so go gentler on phones
     ssaoEnable: !light, // ambient occlusion and bloom are the expensive passes
     ssaoRadius: 0.18,
     ssaoIntensity: 1.1,
@@ -89,8 +89,8 @@ function applyQuality(api: SketchfabApi) {
   // battery) the bike has less contrast, so the same exposure looks washed out and whitish there.
   api.setEnvironment({
     enabled: true,
-    exposure: light ? 1.05 : 1.55,
-    lightIntensity: light ? 2.5 : 3.4,
+    exposure: light ? 0.85 : 1.55,
+    lightIntensity: light ? 1.9 : 3.4,
     rotation: 4.537856055185257,
     shadowEnabled: true,
   });
