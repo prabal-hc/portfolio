@@ -85,7 +85,15 @@ function applyQuality(api: SketchfabApi) {
     vignetteEnable: false, // we draw our own vignette
   });
   // Restrained exposure: soft highlights, shadows that hold shape, so the backdrop's warm/cool lights carry the mood.
-  api.setEnvironment({ enabled: true, exposure: 1.55, lightIntensity: 3.4, rotation: 4.537856055185257, shadowEnabled: true });
+  // Phones get less light: their screens are brighter and punchier, and without ambient occlusion (off above to save
+  // battery) the bike has less contrast, so the same exposure looks washed out and whitish there.
+  api.setEnvironment({
+    enabled: true,
+    exposure: light ? 1.05 : 1.55,
+    lightIntensity: light ? 2.5 : 3.4,
+    rotation: 4.537856055185257,
+    shadowEnabled: true,
+  });
 }
 interface SketchfabClient {
   init(uid: string, opts: Record<string, unknown>): void;
