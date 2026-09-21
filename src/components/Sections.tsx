@@ -17,11 +17,12 @@ function Section({ id, side, children }: { id: string; side: Side; children: Rea
   return (
     <section
       id={id}
-      className="relative flex items-end px-4 pb-[10svh] pt-[50svh] sm:px-8 side:items-center side:px-[clamp(2rem,5vw,9rem)] side:py-[7svh] side:min-h-[62svh]"
+      className="relative flex items-end px-5 pb-[10svh] pt-[50svh] sm:px-8 side:items-center side:px-[clamp(2rem,5vw,9rem)] side:py-[7svh] side:min-h-[62svh]"
     >
       <Reveal
         side={side}
-        className={`relative w-full rounded-2xl bg-bg/70 p-5 backdrop-blur-sm sm:p-7 side:w-[42%] side:max-w-[clamp(28rem,44vw,60rem)] side:rounded-none side:bg-transparent side:p-0 side:backdrop-blur-none ${align}`}
+        // no card behind the text; a soft shadow keeps it readable when it scrolls up over the bike
+        className={`relative w-full [text-shadow:0_1px_16px_rgba(0,0,0,0.85),0_0_2px_rgba(0,0,0,0.6)] side:w-[42%] side:max-w-[clamp(28rem,44vw,60rem)] side:[text-shadow:none] ${align}`}
       >
         {children}
       </Reveal>
@@ -49,9 +50,10 @@ export default function Sections() {
       {/* 00 — hero: bike above, name and welcome hug the bottom */}
       <section
         id="hero"
-        className="relative flex h-[100svh] items-end justify-center px-4 pb-[8svh] text-center sm:px-8 side:pb-[7svh]"
+        // stacked: the text starts just under the bike instead of being pinned to the bottom of the screen
+        className="relative flex min-h-[100svh] items-start justify-center px-5 pb-[8svh] pt-[47svh] text-center sm:px-8 side:items-end side:pb-[7svh] side:pt-0"
       >
-        <Reveal side="right" className="w-full max-w-4xl">
+        <Reveal side="right" className="w-full max-w-4xl [text-shadow:0_1px_16px_rgba(0,0,0,0.85)] side:[text-shadow:none]">
           <p className="flex items-center justify-center gap-3 font-mono text-[10px] uppercase tracking-[0.3em] text-accent sm:text-[11px] sm:tracking-[0.4em] side:text-[clamp(11px,0.85vw,15px)]">
             <span className="h-px w-6 bg-accent/60 sm:w-8" />
             {hero.eyebrow}
@@ -160,9 +162,9 @@ export default function Sections() {
       {/* 05 — closing wide shot, text at the bottom */}
       <section
         id="contact"
-        className="relative flex h-[100svh] items-end justify-center px-4 pb-[8svh] text-center sm:px-8 side:pb-[7svh]"
+        className="relative flex min-h-[100svh] items-start justify-center px-5 pb-[8svh] pt-[47svh] text-center sm:px-8 side:items-end side:pb-[7svh] side:pt-0"
       >
-        <Reveal side="right" className="w-full max-w-3xl side:max-w-[clamp(40rem,52vw,80rem)]">
+        <Reveal side="right" className="w-full max-w-3xl [text-shadow:0_1px_16px_rgba(0,0,0,0.85)] side:max-w-[clamp(40rem,52vw,80rem)] side:[text-shadow:none]">
           <Label>{contact.label}</Label>
           <h2 className="font-display text-[clamp(2.4rem,11.5vw,5rem)] uppercase leading-[0.88] tracking-[0.01em] side:text-[clamp(4rem,min(5.6vw,11svh),9rem)]">
             {contact.title}

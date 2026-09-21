@@ -30,15 +30,24 @@ interface SketchfabApi {
  * The corners only ever contain the dark vignette, never the bike. (The "click & hold" hint is handled by nudging the
  * viewer, not by masking: a mask over the bottom-centre darkens the bike whenever it sweeps past.)
  */
-const CORNER_MASK = (() => {
+function cornerMask(narrow: boolean) {
   const hole = (shape: string, at: string) =>
     `radial-gradient(${shape} at ${at}, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 62%, #000 100%)`;
-  return [
-    hole("ellipse 22% 12%", "0% 0%"), // model title / author, top-left
-    hole("ellipse 6% 8%", "100% 0%"), // share icon, top-right
-    hole("ellipse 14% 8%", "100% 100%"), // viewer controls, bottom-right
-  ].join(", ");
-})();
+  // The viewer's own icons are a fixed pixel size, so on a narrow phone screen they take a much bigger share of it.
+  return (
+    narrow
+      ? [
+          hole("ellipse 60% 11%", "0% 0%"), // model title / author, top-left
+          hole("ellipse 26% 11%", "100% 0%"), // share icon, top-right
+          hole("ellipse 46% 10%", "100% 100%"), // viewer controls, bottom-right
+        ]
+      : [
+          hole("ellipse 22% 12%", "0% 0%"),
+          hole("ellipse 6% 8%", "100% 0%"),
+          hole("ellipse 14% 8%", "100% 100%"),
+        ]
+  ).join(", ");
+}
 
 /**
  * Render the viewer at this multiple of its on-screen size, then scale it down (super-sampling = smoother edges).
@@ -55,7 +64,10 @@ const isLowPower = () => Math.min(window.innerWidth, window.innerHeight) < 700;
 /** Sharper, richer render: full-res textures, ambient occlusion, a touch of bloom, brighter image-based light. */
 function applyQuality(api: SketchfabApi) {
   const light = isLowPower();
-  api.setTextureQuality(light ? "ld" : "hd");
+  // Low-detail textures look blocky on a phone. Use full-res ones whenever the device reports enough memory
+  // (Chrome on Android exposes it); only genuinely small devices stay on the light set.
+  const memoryGB = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+  api.setTextureQuality(light && memoryGB < 4 ? "ld" : "hd");
   api.setPostProcessing({
     enable: true,
     taaEnable: false, // temporal AA smears while the camera is always moving; super-sampling covers edges
@@ -135,9 +147,10 @@ export default function SketchfabStage() {
       if (frame.current) {
         // each layer is opaque except one soft hole; "intersect" makes the holes add up
         const el = frame.current;
-        el.style.setProperty("mask-image", CORNER_MASK);
+        const mask = cornerMask(window.innerWidth < 640);
+        el.style.setProperty("mask-image", mask);
         el.style.setProperty("mask-composite", "intersect");
-        el.style.setProperty("-webkit-mask-image", CORNER_MASK);
+        el.style.setProperty("-webkit-mask-image", mask);
         el.style.setProperty("-webkit-mask-composite", "source-in");
       }
 
