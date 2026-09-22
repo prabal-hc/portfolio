@@ -166,7 +166,7 @@ export default function CaseSlider({ items }: { items: SliderItem[] }) {
         <span
           key={realIndex}
           aria-hidden
-          className="pointer-events-none absolute -left-1 -top-3 z-10 select-none font-display text-[clamp(4.5rem,20vw,7rem)] font-extrabold uppercase leading-none text-transparent [-webkit-text-stroke:1.5px_rgba(236,235,232,0.14)] [animation:numeral-in_0.35s_ease-out] side:-top-4 side:text-[clamp(5rem,7.5vw,9.5rem)]"
+          className="pointer-events-none absolute -left-1 -top-3 z-10 hidden select-none font-display text-[clamp(5rem,7.5vw,9.5rem)] font-extrabold uppercase leading-none text-transparent [-webkit-text-stroke:1.5px_rgba(236,235,232,0.14)] [animation:numeral-in_0.35s_ease-out] side:-top-4 side:block"
         >
           {pad(realIndex + 1)}
         </span>
@@ -186,7 +186,7 @@ export default function CaseSlider({ items }: { items: SliderItem[] }) {
           tabIndex={0}
         >
           <div
-            className="flex select-none"
+            className="flex items-start select-none"
             style={{
               transform: `translateX(calc(${offsetPercent}% + ${dragX}px))`,
               transition: dragging || instant ? "none" : `transform 0.55s ${EASE}`,

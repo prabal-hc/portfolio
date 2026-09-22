@@ -32,14 +32,14 @@ interface SketchfabApi {
  */
 function cornerMask(narrow: boolean) {
   const hole = (shape: string, at: string) =>
-    `radial-gradient(${shape} at ${at}, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 62%, #000 100%)`;
+    `radial-gradient(${shape} at ${at}, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 82%, #000 100%)`;
   // The viewer's own icons are a fixed pixel size, so on a narrow phone screen they take a much bigger share of it.
   return (
     narrow
       ? [
-          hole("ellipse 60% 11%", "0% 0%"), // model title / author, top-left
-          hole("ellipse 26% 11%", "100% 0%"), // share icon, top-right
-          hole("ellipse 46% 10%", "100% 100%"), // viewer controls, bottom-right
+          hole("ellipse 78% 16%", "0% 0%"), // model title / author, top-left (two lines on a narrow phone)
+          hole("ellipse 30% 12%", "100% 0%"), // share icon, top-right
+          hole("ellipse 50% 11%", "100% 100%"), // viewer controls, bottom-right
         ]
       : [
           hole("ellipse 22% 12%", "0% 0%"),
@@ -58,26 +58,22 @@ function supersampleFor(dpr: number) {
   return Math.max(1, Math.min(1.5, 2 / dpr));
 }
 
-/** Small screens (phones, small tablets) get lighter settings so they stay smooth and don't run out of memory. */
-const isLowPower = () => Math.min(window.innerWidth, window.innerHeight) < 700;
-
-/** Sharper, richer render: full-res textures, ambient occlusion, a touch of bloom, brighter image-based light. */
+/** Sharper, richer render: full-res textures, ambient occlusion, a touch of bloom, brighter image-based light.
+ * Same settings on every device, so the bike looks identical on phones and desktops; only genuinely low-memory
+ * devices (reported by Chrome on Android) fall back to lower-res textures. */
 function applyQuality(api: SketchfabApi) {
-  const light = isLowPower();
-  // Low-detail textures look blocky on a phone. Use full-res ones whenever the device reports enough memory
-  // (Chrome on Android exposes it); only genuinely small devices stay on the light set.
   const memoryGB = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
-  api.setTextureQuality(light && memoryGB < 4 ? "ld" : "hd");
+  api.setTextureQuality(memoryGB < 4 ? "ld" : "hd");
   api.setPostProcessing({
     enable: true,
     taaEnable: false, // temporal AA smears while the camera is always moving; super-sampling covers edges
     sharpenEnable: true,
-    sharpenFactor: light ? 0.12 : 0.3, // sharpening exaggerates glints on the glossy paint, so go gentler on phones
-    ssaoEnable: !light, // ambient occlusion and bloom are the expensive passes
+    sharpenFactor: 0.3,
+    ssaoEnable: true,
     ssaoRadius: 0.18,
     ssaoIntensity: 1.1,
     ssaoBias: 0.006,
-    bloomEnable: !light,
+    bloomEnable: true,
     bloomFactor: 0.18,
     bloomThreshold: 0.92,
     bloomRadius: 0.6,
@@ -85,12 +81,10 @@ function applyQuality(api: SketchfabApi) {
     vignetteEnable: false, // we draw our own vignette
   });
   // Restrained exposure: soft highlights, shadows that hold shape, so the backdrop's warm/cool lights carry the mood.
-  // Phones get less light: their screens are brighter and punchier, and without ambient occlusion (off above to save
-  // battery) the bike has less contrast, so the same exposure looks washed out and whitish there.
   api.setEnvironment({
     enabled: true,
-    exposure: light ? 0.85 : 1.55,
-    lightIntensity: light ? 1.9 : 3.4,
+    exposure: 1.55,
+    lightIntensity: 3.4,
     rotation: 4.537856055185257,
     shadowEnabled: true,
   });
