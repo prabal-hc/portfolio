@@ -1,5 +1,6 @@
+import CaseSlider from "./CaseSlider";
 import Reveal from "./Reveal";
-import { about, contact, experience, hero, modelCredit, profile, projects, skills } from "@/data/content";
+import { about, contact, experience, hero, profile, projects, skills } from "@/data/content";
 
 /**
  * Two layouts (see isSideLayout in lib/layout.ts and the `side:` variant in globals.css):
@@ -38,7 +39,7 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 );
 
 const Title = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="mb-5 font-display text-[clamp(2.4rem,11.5vw,4.5rem)] uppercase leading-[0.88] tracking-[0.01em] side:mb-6 side:text-[clamp(3rem,min(6vw,11svh),9rem)]">
+  <h2 className="mb-5 font-display text-[clamp(2rem,9vw,3.4rem)] font-bold uppercase leading-[0.95] tracking-[-0.01em] side:mb-6 side:text-[clamp(2.4rem,min(4.4vw,8svh),6.5rem)]">
     {children}
   </h2>
 );
@@ -63,8 +64,7 @@ export default function Sections() {
           <p className="mt-3 text-lg font-light tracking-wide text-fg/75 sm:text-xl side:mt-4 side:text-[clamp(1.5rem,2vw,3rem)] [@media(max-height:520px)]:hidden">
             {hero.intro}
           </p>
-          {/* the stroke thickens Bebas Neue's single weight into a heavy, poster-bold face */}
-          <h1 className="mt-1 font-display text-[clamp(2.6rem,13.5vw,6rem)] uppercase leading-[0.86] tracking-[0.015em] [-webkit-text-stroke:0.022em_currentColor] side:text-[clamp(4.5rem,min(8.6vw,17svh),13rem)]">
+          <h1 className="mt-1 font-display text-[clamp(2.2rem,10.5vw,4.2rem)] font-extrabold uppercase leading-[0.95] tracking-[-0.01em] side:text-[clamp(3.2rem,min(6vw,11.5svh),8.5rem)]">
             {hero.headline}
             <span className="text-accent">.</span>
           </h1>
@@ -86,7 +86,7 @@ export default function Sections() {
         <dl className="mt-6 grid grid-cols-3 gap-3 border-t border-line pt-5 side:mt-8 side:gap-4 side:pt-6">
           {about.stats.map((s) => (
             <div key={s.k}>
-              <dd className="font-display text-4xl leading-none sm:text-5xl side:text-[clamp(2.75rem,3.4vw,5rem)]">{s.v}</dd>
+              <dd className="font-display text-4xl font-extrabold leading-none sm:text-5xl side:text-[clamp(2.5rem,3vw,4.2rem)]">{s.v}</dd>
               <dt className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted sm:text-[10px] side:text-[clamp(10px,0.7vw,13px)]">
                 {s.k}
               </dt>
@@ -122,39 +122,32 @@ export default function Sections() {
       <Section id="work" side="right">
         <Label>{projects.label}</Label>
         <Title>{projects.title}</Title>
-        <ul className="divide-y divide-line border-y border-line">
-          {projects.items.map((p, i) => (
-            <li key={p.name} className="group flex gap-4 py-4 transition-colors hover:bg-white/[0.03] side:gap-5 side:py-5">
-              <span className="pt-1 font-mono text-xs text-muted">0{i + 1}</span>
-              <div>
-                <h3 className="font-display text-2xl uppercase leading-none tracking-wide transition-colors group-hover:text-accent sm:text-3xl side:text-[clamp(1.75rem,2.1vw,3rem)]">
-                  {p.name}
-                </h3>
-                <p className="mt-1.5 font-mono text-[10px] uppercase tracking-widest text-muted side:text-[clamp(10px,0.7vw,13px)]">{p.tag}</p>
-                <p className={`mt-2 ${body} text-sm side:text-[clamp(14px,0.95vw,19px)]`}>{p.blurb}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <CaseSlider
+          items={projects.items.map((p) => ({
+            key: p.name,
+            eyebrow: p.tag,
+            title: p.name,
+            detail: p.blurb,
+            href: p.href,
+            linkLabel: p.href ? "Visit the site" : undefined,
+          }))}
+        />
       </Section>
 
       {/* 04 — bike right, text left */}
       <Section id="journey" side="left">
         <Label>{experience.label}</Label>
         <Title>{experience.title}</Title>
-        <ol className="relative space-y-5 border-l border-line pl-5 side:space-y-6 side:pl-6">
-          {experience.items.map((e) => (
-            <li key={e.what} className="relative">
-              <span className="absolute -left-[25px] top-1.5 h-2 w-2 rounded-full bg-accent shadow-[0_0_12px_var(--accent)] side:-left-[29px]" />
-              <p className="font-mono text-[10px] uppercase tracking-widest text-muted side:text-[clamp(11px,0.8vw,14px)]">{e.when}</p>
-              <h3 className="mt-1 font-display text-2xl uppercase leading-none tracking-wide sm:text-3xl side:text-[clamp(1.75rem,2.1vw,3rem)]">
-                {e.what}
-              </h3>
-              <p className="mt-1 text-sm text-fg/80 side:text-[clamp(14px,0.95vw,19px)]">{e.where}</p>
-              <p className={`mt-1.5 ${body} text-sm side:text-[clamp(14px,0.95vw,19px)]`}>{e.point}</p>
-            </li>
-          ))}
-        </ol>
+        <CaseSlider
+          items={experience.items.map((e) => ({
+            key: e.what,
+            eyebrow: e.when,
+            title: e.what,
+            meta: e.where,
+            metaHref: e.whereHref,
+            detail: e.point,
+          }))}
+        />
         <p className="mt-5 border-t border-line pt-4 font-mono text-[10px] uppercase tracking-widest text-muted side:mt-6 side:text-[clamp(10px,0.7vw,13px)]">
           {experience.education}
         </p>
@@ -167,7 +160,7 @@ export default function Sections() {
       >
         <Reveal side="right" className="w-full max-w-3xl [text-shadow:0_1px_16px_rgba(0,0,0,0.85)] side:max-w-[clamp(40rem,52vw,80rem)] side:[text-shadow:none]">
           <Label>{contact.label}</Label>
-          <h2 className="font-display text-[clamp(2.4rem,11.5vw,5rem)] uppercase leading-[0.88] tracking-[0.01em] side:text-[clamp(4rem,min(5.6vw,11svh),9rem)]">
+          <h2 className="font-display text-[clamp(2rem,9vw,3.8rem)] font-bold uppercase leading-[0.95] tracking-[-0.01em] side:text-[clamp(3rem,min(4.4vw,8svh),6.5rem)]">
             {contact.title}
           </h2>
           <p className={`mx-auto mt-3 max-w-md ${body} side:max-w-[clamp(28rem,34vw,48rem)]`}>{contact.body}</p>
@@ -184,11 +177,6 @@ export default function Sections() {
               </a>
             ))}
           </div>
-          <p className="mt-6 font-mono text-[9px] uppercase tracking-widest text-muted/60 sm:text-[10px] side:mt-8">
-            <a href={modelCredit.href} target="_blank" rel="noreferrer" className="transition-colors hover:text-accent">
-              {modelCredit.label} · Sketchfab
-            </a>
-          </p>
         </Reveal>
       </section>
     </main>

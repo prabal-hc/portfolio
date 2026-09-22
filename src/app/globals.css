@@ -26,7 +26,7 @@
   --color-accent: var(--accent);
   --font-sans: var(--font-inter);
   --font-display: var(--font-display);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-mono-face);
 }
 
 html {
@@ -98,9 +98,28 @@ html[data-loading] .reveal > * {
   .reveal[data-side="left"] { --dx: -90px; }
 }
 
+/* The Work/Journey case slider's ghost numeral: a quick tick-over each time it changes. */
+@keyframes numeral-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal > * {
     transition-duration: 0.01s;
     transform: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

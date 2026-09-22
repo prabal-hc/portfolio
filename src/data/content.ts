@@ -52,19 +52,27 @@ export const projects = {
   title: "Selected projects.",
   items: [
     {
-      name: "3D Vehicle Configurator",
+      name: "Hyundai IONIQ 9 Configurator",
       tag: "React · Three.js · 4Syte",
-      blurb: "Real-time 3D configurator with live customization and 360° viewing.",
+      blurb: "Real-time 3D vehicle configurator with live trim customization and 360° viewing.",
+      href: "https://hyundai-3dconfigurator.com/",
     },
     {
-      name: "Indians in Korea",
-      tag: "Next.js · TypeScript · Supabase",
-      blurb: "Full-stack community platform: events, announcements, gallery, resources, RBAC and row-level security.",
+      name: "Western Aroma",
+      tag: "Next.js · React · TypeScript",
+      blurb: "Estate-to-cup coffee and spice brand site: product catalogue, storytelling sections and checkout.",
+      href: "https://westernaroma.netlify.app/",
     },
     {
       name: "MediTrack",
       tag: "Next.js · React · TypeScript",
       blurb: "Healthcare management frontend for inventory, billing, customers and pharmacy operations.",
+    },
+    {
+      name: "Entermaya",
+      tag: "Web Development · Contract",
+      blurb: "Contributed several sections to Entermaya's crowdfunding site for the MAYA narrative universe: multimedia storytelling, backer rewards and press coverage.",
+      href: "https://www.entermaya.com/",
     },
   ],
 };
@@ -73,6 +81,13 @@ export const experience = {
   label: "04 — Journey",
   title: "Mile markers.",
   items: [
+    {
+      when: "Jul 2026 (1 mo)",
+      what: "Tech Generalist — Contract",
+      where: "Entermaya · Goa (on-site)",
+      whereHref: "https://www.entermaya.com/",
+      point: "Built out several sections of the existing Entermaya website and an automated web-scraping tool to source marketing lead data.",
+    },
     {
       when: "Jun 2025 — Now",
       what: "Contract Web Developer",
@@ -93,11 +108,6 @@ export const experience = {
     },
   ],
   education: "B.E. Information Science & Engineering · Jyothy Institute of Technology · 2023",
-};
-
-export const modelCredit = {
-  label: "3D model: Royal Enfield Hunter 350 by Bhavik Suthar",
-  href: "https://sketchfab.com/3d-models/royal-enfield-hunter-350-dapper-grey-acb58ee62cfa4644af99caf4adbfdb5b",
 };
 
 export const contact = {

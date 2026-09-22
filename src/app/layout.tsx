@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Inter, Geist_Mono } from "next/font/google";
+import { Sora, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-// Headlines: tall condensed caps, poster / race-number energy.
-const display = Bebas_Neue({
+// Headlines: a bold geometric sans, used at heavier weights for name and section titles.
+const display = Sora({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["600", "700", "800"],
 });
 
 // Body: neutral, highly legible on dark.
@@ -15,14 +15,15 @@ const sans = Inter({
   subsets: ["latin"],
 });
 
-// Labels, numbers, HUD.
-const mono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Labels, dates, tags, HUD readouts.
+const mono = JetBrains_Mono({
+  variable: "--font-mono-face",
   subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "Prabal Holla — Frontend Developer",
+  title: "Prabal Holla",
   description:
     "Portfolio of Prabal Holla, a frontend developer building with React, Next.js and TypeScript. Interactive 3D, built around a Royal Enfield Hunter 350.",
 };
