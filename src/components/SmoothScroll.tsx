@@ -6,7 +6,7 @@ import { progressFromScroll, scroll } from "@/lib/scroll";
 
 export default function SmoothScroll() {
   useEffect(() => {
-    const lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9 });
+    const lenis = new Lenis({ lerp: 0.075, wheelMultiplier: 0.9 });
     scroll.lenis = lenis;
 
     const sync = () => {

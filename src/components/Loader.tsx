@@ -117,8 +117,9 @@ export default function Loader() {
       aria-live="polite"
       aria-label="Loading"
       aria-hidden={done}
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-bg transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.7,0,0.2,1)] ${
-        done ? "pointer-events-none scale-[1.04] opacity-0" : "opacity-100"
+      // exit: the screen lifts like a shutter, uncovering the hero from the bottom up
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-bg transition-[clip-path] duration-[1000ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
+        done ? "pointer-events-none [clip-path:inset(0_0_100%_0)]" : "[clip-path:inset(0_0_0_0)]"
       }`}
     >
       {/* warm glow, like the site backdrop */}

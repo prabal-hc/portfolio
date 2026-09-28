@@ -35,7 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         {/* without JavaScript there is no loader and nothing to wait for: show the page */}
         <noscript>
-          <style>{`#loader{display:none}html[data-loading] .reveal>*{opacity:1!important;transform:none!important}`}</style>
+          <style>{`#loader{display:none}html[data-loading] .reveal *{opacity:1!important;transform:none!important;filter:none!important}.rule::before{transform:none!important}`}</style>
         </noscript>
         {children}
       </body>

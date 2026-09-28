@@ -6,6 +6,8 @@
   --muted: #8b8b92;
   --line: rgba(236, 235, 232, 0.14);
   --accent: #ff6a1a;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* `side:` = text beside the bike. Must match isSideLayout() in src/lib/layout.ts (the camera uses the same rule). */
@@ -110,7 +112,231 @@ html[data-loading] .reveal > * {
   }
 }
 
+/* ---------- Text: words / letters blur-rise in one after another (see Split.tsx) ---------- */
+.split-w,
+.split-c {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(10px);
+  transform: translate3d(0, 0.45em, 0);
+  transition:
+    opacity 0.8s ease,
+    filter 0.8s ease,
+    transform 1s var(--ease-out);
+  transition-delay: calc(var(--i) * var(--s, 70ms) + var(--d, 0ms) + 120ms);
+}
+.split-dot {
+  display: inline-block;
+  transform: scale(0);
+  transition: transform 0.7s var(--ease-back) var(--d, 0ms);
+}
+.reveal[data-in="true"] .split-w,
+.reveal[data-in="true"] .split-c {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
+}
+.reveal[data-in="true"] .split-dot {
+  transform: none;
+}
+
+/* short accent rules beside the hero eyebrow grow outward */
+.line-grow {
+  transform: scaleX(0);
+  transition: transform 1s var(--ease-out) 0.5s;
+}
+.reveal[data-in="true"] .line-grow {
+  transform: scaleX(1);
+}
+
+/* ---------- Divider lines draw across, starting orange ---------- */
+.rule {
+  position: relative;
+}
+.rule::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), var(--line) 35%);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 1.3s var(--ease-out) calc(var(--i, 0) * 90ms + 200ms);
+}
+.reveal[data-in="true"] .rule::before {
+  transform: scaleX(1);
+}
+
+/* ---------- Skill pills cascade in; hover lifts and glows ---------- */
+.pill {
+  --pd: calc(var(--i, 0) * 28ms + 250ms);
+  opacity: 0;
+  transform: translate3d(0, 14px, 0) scale(0.92);
+  transition:
+    opacity 0.5s ease var(--pd),
+    transform 0.7s var(--ease-out) var(--pd),
+    translate 0.3s var(--ease-out),
+    border-color 0.25s,
+    color 0.25s,
+    background-color 0.25s,
+    box-shadow 0.3s;
+}
+.reveal[data-in="true"] .pill {
+  opacity: 1;
+  transform: none;
+}
+.pill:hover {
+  translate: 0 -3px;
+  border-color: var(--accent);
+  color: var(--accent);
+  background-color: rgba(255, 106, 26, 0.08);
+  box-shadow: 0 8px 24px -10px rgba(255, 106, 26, 0.6);
+}
+
+/* ---------- Links: underline sweeps in on hover ---------- */
+.link-sweep {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition:
+    background-size 0.45s var(--ease-out),
+    color 0.25s;
+}
+.link-sweep:hover {
+  background-size: 100% 1px;
+}
+
+/* ---------- Contact button: a glint sweeps across every few seconds ---------- */
+.shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: shine 4s ease-in-out 1.5s infinite;
+}
+@keyframes shine {
+  0% {
+    transform: translateX(-120%);
+  }
+  30%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* ---------- Hero scroll cue (stacked layout) ---------- */
+@keyframes cue {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+}
+.hero-cue {
+  transition: opacity 1s ease 1.4s;
+}
+html[data-loading] .hero-cue {
+  opacity: 0;
+  transition: none;
+}
+
+/* ---------- Case slider: each slide's text trails the strip, then settles (parallax stagger) ---------- */
+@keyframes slide-el-in {
+  from {
+    opacity: 0;
+    transform: translate3d(calc(var(--from, 1) * 36px), 0, 0);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+.case-slide[data-current="true"] .slide-el {
+  animation: slide-el-in 0.85s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 140ms);
+}
+/* story-style segment: fills up until the next auto-advance */
+@keyframes seg-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- Cursor ring + headlight glow (desktop, see Cursor.tsx) ---------- */
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(236, 235, 232, 0.45);
+  transition:
+    width 0.35s var(--ease-out),
+    height 0.35s var(--ease-out),
+    background-color 0.3s,
+    border-color 0.3s,
+    opacity 0.3s;
+}
+.cursor-ring span {
+  font-family: var(--font-mono-face), monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #000;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.cursor-ring[data-mode="link"] {
+  width: 58px;
+  height: 58px;
+  border-color: var(--accent);
+  background-color: rgba(255, 106, 26, 0.08);
+}
+.cursor-ring[data-mode="drag"] {
+  width: 76px;
+  height: 76px;
+  border-color: transparent;
+  background-color: var(--accent);
+}
+.cursor-ring[data-mode="drag"] span {
+  opacity: 1;
+}
+.cursor-glow {
+  background: radial-gradient(circle, rgba(255, 150, 80, 0.09), transparent 65%);
+  mix-blend-mode: screen;
+  transition: opacity 0.6s;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .split-w,
+  .split-c,
+  .split-dot,
+  .pill,
+  .line-grow,
+  .rule::before {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .cursor-ring,
+  .cursor-glow,
+  .shine::after {
+    display: none;
+  }
   .reveal > * {
     transition-duration: 0.01s;
     transform: none;

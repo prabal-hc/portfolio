@@ -13,7 +13,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
  *  - You can always move it yourself: drag/swipe (mouse, touch or pen, via the Pointer Events API) follows the
  *    pointer live and springs back or commits on release, and the arrow buttons and ← → keys work at any time.
  *
- * A giant ghost numeral behind the text ticks over on top, and a slim arrow + progress-bar nav sits below.
+ * A giant ghost numeral ticks over on top (side layout), each slide's text trails the strip in with a short stagger,
+ * and below sits an arrow nav with story-style segments that fill up until the next auto-advance.
  * No boxed card — the bike stays visible around the text, same as elsewhere on the site.
  */
 export interface SliderItem {
@@ -43,6 +44,7 @@ export default function CaseSlider({ items }: { items: SliderItem[] }) {
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [dir, setDir] = useState<1 | -1>(1); // which side the incoming slide's text trails in from
 
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [clipHeight, setClipHeight] = useState<number>();
@@ -78,6 +80,7 @@ export default function CaseSlider({ items }: { items: SliderItem[] }) {
   const goNext = () => {
     if (animating.current) return;
     animating.current = true;
+    setDir(1);
     setRealIndex((i) => (i + 1) % total);
     setTrackPos((p) => {
       const next = p + 1;
@@ -94,6 +97,7 @@ export default function CaseSlider({ items }: { items: SliderItem[] }) {
   const goPrev = () => {
     if (animating.current) return;
     animating.current = true;
+    setDir(-1);
     setRealIndex((i) => (i - 1 + total) % total);
     setTrackPos((p) => {
       const prev = p - 1;
@@ -148,6 +152,7 @@ export default function CaseSlider({ items }: { items: SliderItem[] }) {
   };
 
   const offsetPercent = -trackPos * 100;
+  const running = !paused && !dragging;
 
   return (
     <div
@@ -172,7 +177,8 @@ export default function CaseSlider({ items }: { items: SliderItem[] }) {
         </span>
 
         <div
-          className="touch-pan-y overflow-hidden transition-[height] duration-300 ease-out"
+          data-cursor="drag"
+          className="cursor-grab touch-pan-y overflow-hidden transition-[height] duration-300 ease-out active:cursor-grabbing"
           style={{ height: clipHeight }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -187,31 +193,44 @@ export default function CaseSlider({ items }: { items: SliderItem[] }) {
         >
           <div
             className="flex items-start select-none"
-            style={{
-              transform: `translateX(calc(${offsetPercent}% + ${dragX}px))`,
-              transition: dragging || instant ? "none" : `transform 0.55s ${EASE}`,
-            }}
+            style={
+              {
+                transform: `translateX(calc(${offsetPercent}% + ${dragX}px))`,
+                transition: dragging || instant ? "none" : `transform 0.55s ${EASE}`,
+                "--from": dir,
+              } as React.CSSProperties
+            }
           >
             {slides.map((item, i) => {
               const isActive = i === trackPos;
+              // clones count as the item they copy, so after a silent wrap-around snap the real slide has already
+              // played its entrance and nothing replays
+              const itemIndex = i === 0 ? total - 1 : i === total + 1 ? 0 : i - 1;
+              const at = (n: number) => ({ "--i": n }) as React.CSSProperties;
               return (
                 <div
                   key={`${item.key}-${i}`}
-                  ref={(el) => {
-                    slideRefs.current[i] = el;
+                  ref={(node) => {
+                    slideRefs.current[i] = node;
                   }}
-                  className="w-full shrink-0 pt-8 side:pt-10"
+                  data-current={itemIndex === realIndex}
+                  className="case-slide w-full shrink-0 pt-8 side:pt-10"
                   aria-hidden={!isActive}
                   inert={!isActive}
                 >
-                  <p className="font-mono text-xs uppercase tracking-widest text-accent">{item.eyebrow}</p>
-                  <h3 className="mt-1.5 font-display text-2xl font-bold uppercase leading-tight tracking-[-0.01em] sm:text-3xl side:text-[clamp(1.6rem,2vw,2.7rem)]">
+                  <p style={at(0)} className="slide-el font-mono text-xs uppercase tracking-widest text-accent">
+                    {item.eyebrow}
+                  </p>
+                  <h3
+                    style={at(1)}
+                    className="slide-el mt-1.5 font-display text-2xl font-bold uppercase leading-tight tracking-[-0.01em] sm:text-3xl side:text-[clamp(1.6rem,2vw,2.7rem)]"
+                  >
                     {item.title}
                   </h3>
                   {item.meta && (
-                    <p className="mt-1.5 font-mono text-[10px] uppercase tracking-widest text-muted side:text-[clamp(10px,0.7vw,13px)]">
+                    <p style={at(2)} className="slide-el mt-1.5 font-mono text-[10px] uppercase tracking-widest text-muted side:text-[clamp(10px,0.7vw,13px)]">
                       {item.metaHref ? (
-                        <a href={item.metaHref} target="_blank" rel="noreferrer" className="transition-colors hover:text-accent hover:underline">
+                        <a href={item.metaHref} target="_blank" rel="noreferrer" className="link-sweep hover:text-accent">
                           {item.meta}
                         </a>
                       ) : (
@@ -219,13 +238,16 @@ export default function CaseSlider({ items }: { items: SliderItem[] }) {
                       )}
                     </p>
                   )}
-                  <p className="mt-3 max-w-md text-sm leading-relaxed text-muted side:text-[clamp(14px,0.95vw,19px)]">{item.detail}</p>
+                  <p style={at(3)} className="slide-el mt-3 max-w-md text-sm leading-relaxed text-muted side:text-[clamp(14px,0.95vw,19px)]">
+                    {item.detail}
+                  </p>
                   {item.href && (
                     <a
+                      style={at(4)}
                       href={item.href}
                       target="_blank"
                       rel="noreferrer"
-                      className="group/link mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-fg transition-colors hover:text-accent"
+                      className="slide-el group/link link-sweep mt-4 inline-flex items-center gap-1.5 pb-0.5 font-mono text-[11px] uppercase tracking-widest text-fg hover:text-accent"
                     >
                       {item.linkLabel ?? "Visit"}
                       <svg
@@ -258,11 +280,21 @@ export default function CaseSlider({ items }: { items: SliderItem[] }) {
           </svg>
         </button>
 
-        <div className="relative h-px flex-1 bg-line">
-          <span
-            className="absolute inset-y-0 left-0 bg-accent transition-[width] duration-300 ease-out"
-            style={{ width: `${((realIndex + 1) / total) * 100}%` }}
-          />
+        {/* one segment per item: done ones stay lit, the current one fills up until the next auto-advance
+            (and just shows full while autoplay is held by hover, focus or a drag) */}
+        <div className="flex flex-1 gap-1.5" aria-hidden>
+          {items.map((item, i) => (
+            <span key={item.key} className="relative h-[2px] flex-1 overflow-hidden rounded-full bg-line">
+              {i < realIndex && <span className="absolute inset-0 bg-accent/55" />}
+              {i === realIndex && (
+                <span
+                  key={`${realIndex}-${running}`}
+                  className="absolute inset-0 origin-left bg-accent"
+                  style={running ? { animation: `seg-fill ${AUTOPLAY_MS}ms linear both` } : undefined}
+                />
+              )}
+            </span>
+          ))}
         </div>
 
         <button

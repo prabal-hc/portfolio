@@ -1,3 +1,4 @@
+import Cursor from "@/components/Cursor";
 import Hud from "@/components/Hud";
 import Loader from "@/components/Loader";
 import Sections from "@/components/Sections";
@@ -9,6 +10,7 @@ export default function Home() {
     <>
       <SmoothScroll />
       <SceneClient />
+      <Cursor />
       <Sections />
       <Hud />
       <Loader />

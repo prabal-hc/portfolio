@@ -30,21 +30,23 @@ interface SketchfabApi {
  * The corners only ever contain the dark vignette, never the bike. (The "click & hold" hint is handled by nudging the
  * viewer, not by masking: a mask over the bottom-centre darkens the bike whenever it sweeps past.)
  */
-function cornerMask(narrow: boolean) {
+function cornerMask(touch: boolean) {
   const hole = (shape: string, at: string) =>
     `radial-gradient(${shape} at ${at}, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 82%, #000 100%)`;
-  // The viewer's own icons are a fixed pixel size, so on a narrow phone screen they take a much bigger share of it.
+  // Sized in pixels, not percent: the viewer draws its UI at a fixed pixel size (in the iframe's own, pre-scale
+  // pixels, which is also what the mask is measured in), so a percentage hole is too small on smaller windows.
+  // Touch devices get the viewer's more compact mobile UI.
   return (
-    narrow
+    touch
       ? [
-          hole("ellipse 78% 16%", "0% 0%"), // model title / author, top-left (two lines on a narrow phone)
-          hole("ellipse 30% 12%", "100% 0%"), // share icon, top-right
-          hole("ellipse 50% 11%", "100% 100%"), // viewer controls, bottom-right
+          hole("ellipse 300px 70px", "0% 0%"), // model title / author, top-left
+          hole("ellipse 90px 70px", "100% 0%"), // share icon, top-right
+          hole("ellipse 200px 80px", "100% 100%"), // viewer controls, bottom-right
         ]
       : [
-          hole("ellipse 22% 12%", "0% 0%"),
-          hole("ellipse 6% 8%", "100% 0%"),
-          hole("ellipse 14% 8%", "100% 100%"),
+          hole("ellipse 420px 84px", "0% 0%"),
+          hole("ellipse 120px 80px", "100% 0%"),
+          hole("ellipse 260px 100px", "100% 100%"),
         ]
   ).join(", ");
 }
@@ -149,7 +151,7 @@ export default function SketchfabStage() {
       if (frame.current) {
         // each layer is opaque except one soft hole; "intersect" makes the holes add up
         const el = frame.current;
-        const mask = cornerMask(window.innerWidth < 640);
+        const mask = cornerMask(window.matchMedia("(pointer: coarse)").matches);
         el.style.setProperty("mask-image", mask);
         el.style.setProperty("mask-composite", "intersect");
         el.style.setProperty("-webkit-mask-image", mask);
